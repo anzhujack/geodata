@@ -59,7 +59,7 @@ sha256sum -c geoip.dat.sha256
 | geosite | geolocation-!cn | 保留原名及原规则，合并 DustinWin proxy 与 blackmatrix7 Global |
 | geosite | category-ads-all | 保留原名及原规则，合并 DustinWin ads 与 blackmatrix7 Advertising |
 | geosite | proxy、ads | 继续提供上一版短名称分类，分别汇总相同的代理/广告来源 |
-| geosite | ai | DustinWin AI + Loyalsoldier OpenAI + blackmatrix7 OpenAI |
+| geosite | ai | DustinWin AI + Loyalsoldier 完整 category-ai-!cn + blackmatrix7 OpenAI |
 | geosite | openai | 保留 Loyalsoldier OpenAI 原分类，仅补充 blackmatrix7 OpenAI，不混入整个 ai 分类 |
 | geosite | telegram、github | Loyalsoldier + blackmatrix7 |
 | geosite | youtube、netflix、disney | 三方同类域名合并 |
@@ -71,6 +71,28 @@ sha256sum -c geoip.dat.sha256
 | geoip | media | 保留同名基底（若有），补充 DustinWin |
 
 `proxy` 与 `geolocation-!cn`、`ads` 与 `category-ads-all` 现在是各自独立的增强分类，不通过别名覆盖原始标签；个人增删只影响指定的那个名称。如果只使用 Loyalsoldier 的标准名称，就编辑对应标准名称的个人文件。DustinWin 与 blackmatrix7 的补充范围仍由增强映射明确控制，不扫描 blackmatrix7 仓库中与 DAT 无关的进程、端口等规则。
+
+### AI 分类覆盖
+
+`geosite:ai` 同时合并 DustinWin 的 AI 列表、Loyalsoldier 的完整 `category-ai-!cn` 和 blackmatrix7 OpenAI。它覆盖 Claude/Anthropic、ChatGPT/OpenAI、Gemini、微软 Copilot、GitHub Copilot、Grok、Perplexity、Cursor、Mistral、Meta AI、OpenRouter、Hugging Face、Poe、Windsurf、Groq、Cohere、Midjourney 等，具体域名随上游更新。不能仅根据配置里 blackmatrix7 的 `OpenAI` 文件名判断整个聚合的范围。
+
+例如 Claude 的 `claude.ai`、`claude.com`、`api.anthropic.com` 都应匹配统一的 `ai`。各服务的独立分类也保留，可按需单独分流：
+
+| 服务 | 独立分类 |
+| --- | --- |
+| Claude / Anthropic | `anthropic` |
+| ChatGPT / OpenAI | `openai` |
+| Gemini | `google-gemini` |
+| GitHub Copilot | `github-copilot` |
+| Grok | `xai` |
+| Perplexity | `perplexity` |
+| Cursor | `cursor` |
+| Hugging Face | `huggingface` |
+| Poe | `poe` |
+| Windsurf | `windsurf` |
+| Groq | `groq` |
+
+国内 AI 的完整分类 `category-ai-cn` 同样从 Loyalsoldier 保留，可以独立设置策略；这里不会将该国内聚合整体加入 `ai`，以延续既有 AI 分流范围。
 
 ### 去重与冲突
 

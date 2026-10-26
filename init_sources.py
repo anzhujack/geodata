@@ -26,7 +26,7 @@ for tag in ['cn', 'proxy', 'ads', 'private', 'ai', 'gfw', 'fakeip-filter', 'trac
             'networktest', 'tld-proxy']:
     site[tag] = [ref('dustin-site', tag)]
 # Same-name Loyalsoldier categories are inherited automatically.
-loyal = {'proxy': 'geolocation-!cn', 'ads': 'category-ads-all', 'ai': 'openai'}
+loyal = {'proxy': 'geolocation-!cn', 'ads': 'category-ads-all', 'ai': 'category-ai-!cn'}
 for tag, upstream in loyal.items():
     site.setdefault(tag, []).append(ref('loyal-site', upstream))
 for tag in bm:
