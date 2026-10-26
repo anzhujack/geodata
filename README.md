@@ -45,7 +45,8 @@ https://github.com/anzhujack/geodata/releases/latest/download/sha256sums.txt
 
 | 类型 | 分类 | 增强方式 |
 | --- | --- | --- |
-| geosite | cn、private | 在 Loyalsoldier 原分类上合并 DustinWin 与 blackmatrix7 |
+| geosite | cn | 在 Loyalsoldier cn 上合并 DustinWin cn 与 blackmatrix7 ChinaMax 的域名规则 |
+| geosite | private | 在 Loyalsoldier private 上合并 DustinWin 与 blackmatrix7 Lan |
 | geosite | geolocation-!cn | 保留原名及原规则，合并 DustinWin proxy 与 blackmatrix7 Global |
 | geosite | category-ads-all | 保留原名及原规则，合并 DustinWin ads 与 blackmatrix7 Advertising |
 | geosite | proxy、ads | 继续提供上一版短名称分类，分别汇总相同的代理/广告来源 |
@@ -56,7 +57,8 @@ https://github.com/anzhujack/geodata/releases/latest/download/sha256sums.txt
 | geosite | games、games-cn | 继承存在的同名基底分类，再补充 DustinWin + blackmatrix7 Game / GameDownloadCN |
 | geosite | apple-cn、google-cn | Loyalsoldier + DustinWin |
 | geosite | microsoft-cn、gfw、fakeip-filter、trackerslist、max、primevideo、appletv、tiktok、bilibili、spotify、media、networktest、tld-proxy | 保留同名基底（若有），按配置补充 DustinWin |
-| geoip | cn、private、telegram、netflix | 原分类合并 DustinWin 与 blackmatrix7 的对应 CIDR |
+| geoip | cn | 原分类合并 DustinWin cn 与 blackmatrix7 ChinaMax 的 IPv4/IPv6 CIDR |
+| geoip | private、telegram、netflix | 原分类合并 DustinWin 与 blackmatrix7 的对应 CIDR |
 | geoip | media | 保留同名基底（若有），补充 DustinWin |
 
 `proxy` 与 `geolocation-!cn`、`ads` 与 `category-ads-all` 现在是各自独立的增强分类，不通过别名覆盖原始标签；个人增删只影响指定的那个名称。如果只使用 Loyalsoldier 的标准名称，就编辑对应标准名称的个人文件。DustinWin 与 blackmatrix7 的补充范围仍由增强映射明确控制，不扫描 blackmatrix7 仓库中与 DAT 无关的进程、端口等规则。

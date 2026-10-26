@@ -9,7 +9,7 @@ sources = {
     'loyal-ip': {'url': 'https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/geoip.dat', 'format': 'geoip'},
 }
 # Explicit mappings avoid accidentally equating lists with different meanings.
-bm = {'cn': 'China', 'proxy': 'Global', 'ads': 'Advertising', 'private': 'Lan',
+bm = {'cn': 'ChinaMax', 'proxy': 'Global', 'ads': 'Advertising', 'private': 'Lan',
       'ai': 'OpenAI', 'telegram': 'Telegram', 'youtube': 'YouTube', 'netflix': 'Netflix',
       'disney': 'Disney', 'github': 'GitHub', 'games': 'Game', 'games-cn': 'Game/GameDownloadCN'}
 for tag, path in bm.items():
