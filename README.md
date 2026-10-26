@@ -13,7 +13,7 @@
 1. 创建空的**公开仓库**，例如 `my-geodata`，默认分支为 `main`。无需 fork 上游，也无需填写个人访问令牌。
 2. 把本项目的内容放入仓库根目录，务必包括隐藏目录 `.github`。不要把外层 `personal-geodata` 文件夹整体作为仓库内的子目录。
 3. 在 Actions 中启用工作流，选择 **Build geodata → Run workflow**。发布步骤使用仓库自带 `GITHUB_TOKEN`，已在工作流中声明 `contents: write`；组织若限制 Actions 写权限，需要管理员允许该权限。
-4. 成功后 Releases 会出现 `build-运行编号-重试编号`，包含两个 DAT、来源清单 `manifest.json` 和 `sha256sums.txt`。每次先上传到草稿，再公开并设为 Latest，保留历史版本便于回滚。
+4. 成功后 Releases 会出现 `build-运行编号-重试编号`，包含两个 DAT、来源清单 `manifest.json`、汇总校验 `sha256sums.txt`，以及独立校验文件 `geosite.dat.sha256`、`geoip.dat.sha256`。每次先上传到草稿，再公开并设为 Latest，保留历史版本便于回滚。
 
 固定下载地址（本仓库为 `anzhujack/geodata`；fork 后替换为自己的仓库）：
 
@@ -22,6 +22,15 @@ https://github.com/anzhujack/geodata/releases/latest/download/geosite.dat
 https://github.com/anzhujack/geodata/releases/latest/download/geoip.dat
 https://github.com/anzhujack/geodata/releases/latest/download/manifest.json
 https://github.com/anzhujack/geodata/releases/latest/download/sha256sums.txt
+https://github.com/anzhujack/geodata/releases/latest/download/geosite.dat.sha256
+https://github.com/anzhujack/geodata/releases/latest/download/geoip.dat.sha256
+```
+
+每个独立校验文件仅包含对应 DAT 的一行 `SHA256  文件名`，每次构建按实际文件重新计算。将 DAT 与对应校验文件放在同一目录后，可分别运行：
+
+```sh
+sha256sum -c geosite.dat.sha256
+sha256sum -c geoip.dat.sha256
 ```
 
 本地若要求两个 DAT 一定来自同一次构建，使用附带更新脚本：它只解析一次 Latest，后续下载同一版本标签下的文件，避免恰好发布时两个固定链接跨版本。

@@ -43,7 +43,10 @@ jobs:
         run: python build.py --config sources.json --output dist
       - name: Verify checksums
         working-directory: dist
-        run: sha256sum -c sha256sums.txt
+        run: |
+          sha256sum -c sha256sums.txt
+          sha256sum -c geosite.dat.sha256
+          sha256sum -c geoip.dat.sha256
       - uses: actions/upload-artifact@v4
         with:
           name: geodata
