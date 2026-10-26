@@ -1,0 +1,409 @@
+{
+  "sources": {
+    "dustin-site": {
+      "url": "https://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-geodata/geosite-all.dat",
+      "format": "geosite"
+    },
+    "dustin-ip": {
+      "url": "https://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-geodata/geoip.dat",
+      "format": "geoip"
+    },
+    "loyal-site": {
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/geosite.dat",
+      "format": "geosite"
+    },
+    "loyal-ip": {
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/geoip.dat",
+      "format": "geoip"
+    },
+    "bm-cn": {
+      "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/China/China.list",
+      "format": "clash"
+    },
+    "bm-proxy": {
+      "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Global/Global.list",
+      "format": "clash"
+    },
+    "bm-ads": {
+      "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Advertising/Advertising.list",
+      "format": "clash"
+    },
+    "bm-private": {
+      "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Lan/Lan.list",
+      "format": "clash"
+    },
+    "bm-ai": {
+      "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/OpenAI/OpenAI.list",
+      "format": "clash"
+    },
+    "bm-telegram": {
+      "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Telegram/Telegram.list",
+      "format": "clash"
+    },
+    "bm-youtube": {
+      "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/YouTube/YouTube.list",
+      "format": "clash"
+    },
+    "bm-netflix": {
+      "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Netflix/Netflix.list",
+      "format": "clash"
+    },
+    "bm-disney": {
+      "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Disney/Disney.list",
+      "format": "clash"
+    },
+    "bm-github": {
+      "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/GitHub/GitHub.list",
+      "format": "clash"
+    },
+    "bm-games": {
+      "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Game/Game.list",
+      "format": "clash"
+    },
+    "bm-games-cn": {
+      "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Game/GameDownloadCN/GameDownloadCN.list",
+      "format": "clash"
+    }
+  },
+  "geosite": {
+    "cn": [
+      {
+        "source": "dustin-site",
+        "tag": "cn"
+      },
+      {
+        "source": "loyal-site",
+        "tag": "cn"
+      },
+      {
+        "source": "bm-cn"
+      }
+    ],
+    "proxy": [
+      {
+        "source": "dustin-site",
+        "tag": "proxy"
+      },
+      {
+        "source": "loyal-site",
+        "tag": "geolocation-!cn"
+      },
+      {
+        "source": "bm-proxy"
+      }
+    ],
+    "ads": [
+      {
+        "source": "dustin-site",
+        "tag": "ads"
+      },
+      {
+        "source": "loyal-site",
+        "tag": "category-ads-all"
+      },
+      {
+        "source": "bm-ads"
+      }
+    ],
+    "private": [
+      {
+        "source": "dustin-site",
+        "tag": "private"
+      },
+      {
+        "source": "loyal-site",
+        "tag": "private"
+      },
+      {
+        "source": "bm-private"
+      }
+    ],
+    "ai": [
+      {
+        "source": "dustin-site",
+        "tag": "ai"
+      },
+      {
+        "source": "loyal-site",
+        "tag": "openai"
+      },
+      {
+        "source": "bm-ai"
+      }
+    ],
+    "gfw": [
+      {
+        "source": "dustin-site",
+        "tag": "gfw"
+      },
+      {
+        "source": "loyal-site",
+        "tag": "gfw"
+      }
+    ],
+    "fakeip-filter": [
+      {
+        "source": "dustin-site",
+        "tag": "fakeip-filter"
+      }
+    ],
+    "trackerslist": [
+      {
+        "source": "dustin-site",
+        "tag": "trackerslist"
+      }
+    ],
+    "microsoft-cn": [
+      {
+        "source": "dustin-site",
+        "tag": "microsoft-cn"
+      }
+    ],
+    "apple-cn": [
+      {
+        "source": "dustin-site",
+        "tag": "apple-cn"
+      },
+      {
+        "source": "loyal-site",
+        "tag": "apple-cn"
+      }
+    ],
+    "google-cn": [
+      {
+        "source": "dustin-site",
+        "tag": "google-cn"
+      },
+      {
+        "source": "loyal-site",
+        "tag": "google-cn"
+      }
+    ],
+    "games-cn": [
+      {
+        "source": "dustin-site",
+        "tag": "games-cn"
+      },
+      {
+        "source": "bm-games-cn"
+      }
+    ],
+    "games": [
+      {
+        "source": "dustin-site",
+        "tag": "games"
+      },
+      {
+        "source": "bm-games"
+      }
+    ],
+    "netflix": [
+      {
+        "source": "dustin-site",
+        "tag": "netflix"
+      },
+      {
+        "source": "loyal-site",
+        "tag": "netflix"
+      },
+      {
+        "source": "bm-netflix"
+      }
+    ],
+    "disney": [
+      {
+        "source": "dustin-site",
+        "tag": "disney"
+      },
+      {
+        "source": "loyal-site",
+        "tag": "disney"
+      },
+      {
+        "source": "bm-disney"
+      }
+    ],
+    "max": [
+      {
+        "source": "dustin-site",
+        "tag": "max"
+      }
+    ],
+    "primevideo": [
+      {
+        "source": "dustin-site",
+        "tag": "primevideo"
+      }
+    ],
+    "appletv": [
+      {
+        "source": "dustin-site",
+        "tag": "appletv"
+      }
+    ],
+    "youtube": [
+      {
+        "source": "dustin-site",
+        "tag": "youtube"
+      },
+      {
+        "source": "loyal-site",
+        "tag": "youtube"
+      },
+      {
+        "source": "bm-youtube"
+      }
+    ],
+    "tiktok": [
+      {
+        "source": "dustin-site",
+        "tag": "tiktok"
+      },
+      {
+        "source": "loyal-site",
+        "tag": "tiktok"
+      }
+    ],
+    "bilibili": [
+      {
+        "source": "dustin-site",
+        "tag": "bilibili"
+      },
+      {
+        "source": "loyal-site",
+        "tag": "bilibili"
+      }
+    ],
+    "spotify": [
+      {
+        "source": "dustin-site",
+        "tag": "spotify"
+      },
+      {
+        "source": "loyal-site",
+        "tag": "spotify"
+      }
+    ],
+    "media": [
+      {
+        "source": "dustin-site",
+        "tag": "media"
+      }
+    ],
+    "networktest": [
+      {
+        "source": "dustin-site",
+        "tag": "networktest"
+      }
+    ],
+    "tld-proxy": [
+      {
+        "source": "dustin-site",
+        "tag": "tld-proxy"
+      }
+    ],
+    "telegram": [
+      {
+        "source": "loyal-site",
+        "tag": "telegram"
+      },
+      {
+        "source": "bm-telegram"
+      }
+    ],
+    "github": [
+      {
+        "source": "loyal-site",
+        "tag": "github"
+      },
+      {
+        "source": "bm-github"
+      }
+    ],
+    "google": [
+      {
+        "source": "loyal-site",
+        "tag": "google"
+      }
+    ],
+    "apple": [
+      {
+        "source": "loyal-site",
+        "tag": "apple"
+      }
+    ],
+    "microsoft": [
+      {
+        "source": "loyal-site",
+        "tag": "microsoft"
+      }
+    ]
+  },
+  "geoip": {
+    "cn": [
+      {
+        "source": "dustin-ip",
+        "tag": "cn"
+      },
+      {
+        "source": "loyal-ip",
+        "tag": "cn"
+      },
+      {
+        "source": "bm-cn"
+      }
+    ],
+    "private": [
+      {
+        "source": "dustin-ip",
+        "tag": "private"
+      },
+      {
+        "source": "loyal-ip",
+        "tag": "private"
+      },
+      {
+        "source": "bm-private"
+      }
+    ],
+    "telegram": [
+      {
+        "source": "dustin-ip",
+        "tag": "telegram"
+      },
+      {
+        "source": "loyal-ip",
+        "tag": "telegram"
+      },
+      {
+        "source": "bm-telegram"
+      }
+    ],
+    "netflix": [
+      {
+        "source": "dustin-ip",
+        "tag": "netflix"
+      },
+      {
+        "source": "loyal-ip",
+        "tag": "netflix"
+      },
+      {
+        "source": "bm-netflix"
+      }
+    ],
+    "media": [
+      {
+        "source": "dustin-ip",
+        "tag": "media"
+      }
+    ]
+  },
+  "aliases": {
+    "geosite": {
+      "geolocation-!cn": "proxy",
+      "category-ads-all": "ads"
+    },
+    "geoip": {}
+  }
+}

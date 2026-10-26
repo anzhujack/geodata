@@ -1,0 +1,76 @@
+name: Build geodata
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 08:30 Asia/Shanghai, after the upstream daily builds.
+    - cron: '30 0 * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'build.py'
+      - 'sources.json'
+      - 'custom/**'
+      - 'tests/**'
+      - '.github/workflows/build.yml'
+  pull_request:
+    paths:
+      - 'build.py'
+      - 'sources.json'
+      - 'custom/**'
+      - 'tests/**'
+      - '.github/workflows/build.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: geodata-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test merger
+        run: python -m unittest discover -s tests -v
+      - name: Fetch, merge and validate
+        run: python build.py --config sources.json --output dist
+      - name: Verify checksums
+        working-directory: dist
+        run: sha256sum -c sha256sums.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: geodata
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: geodata
+          path: dist
+      - name: Publish a complete versioned release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          COMMIT: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="build-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          printf 'Automatically merged geodata.\n\nSource commit: %s\nSee manifest.json for upstream hashes, category counts and skipped rule types.\n' "$COMMIT" > notes.txt
+          gh release create "$tag" dist/* --target "$COMMIT" --title "Geodata $tag" --notes-file notes.txt --draft
+          gh release edit "$tag" --draft=false --latest

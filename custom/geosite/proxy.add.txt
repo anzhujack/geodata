@@ -1,0 +1,2 @@
+# 每行一个域名；仅影响 proxy 分类。
+# domain:example.org
