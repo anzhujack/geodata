@@ -238,9 +238,9 @@ def build(config:dict, output:Path):
     stage=Path(tempfile.mkdtemp(prefix='.staging-',dir=output.parent))
     try:
         (stage/'geosite.dat').write_bytes(gs); (stage/'geoip.dat').write_bytes(gi)
-        (stage/'manifest.json').write_text(json.dumps(manifest,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+        (stage/'manifest.json').write_text(json.dumps(manifest,indent=2,sort_keys=True)+'\n',encoding='utf-8',newline='\n')
         sums=''.join(f'{hashlib.sha256((stage/n).read_bytes()).hexdigest()}  {n}\n' for n in ('geosite.dat','geoip.dat','manifest.json'))
-        (stage/'sha256sums.txt').write_text(sums,encoding='utf-8')
+        (stage/'sha256sums.txt').write_text(sums,encoding='utf-8',newline='\n')
         for n in ('geosite.dat','geoip.dat','manifest.json','sha256sums.txt'): os.replace(stage/n,output/n)
     finally:
         shutil.rmtree(stage,ignore_errors=True)

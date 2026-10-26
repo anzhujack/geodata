@@ -96,6 +96,8 @@ class BuildTests(unittest.TestCase):
         manifest = self.build(cfg)
         self.assertEqual(manifest['counts']['geosite'], {'custom': 1, 'alias': 1})
         self.assertEqual(manifest['counts']['geoip']['custom'], 1)
+        self.assertNotIn(b'\r', (self.output / 'sha256sums.txt').read_bytes())
+        self.assertNotIn(b'\r', (self.output / 'manifest.json').read_bytes())
 
     def test_truncated_wire_and_unknown_domain_type_rejected(self):
         with self.assertRaises(b.BuildError):
