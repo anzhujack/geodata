@@ -170,13 +170,83 @@ def load_source(spec, cache):
     if fmt=='geoip': return ('geoip',decode_geoip(raw))
     raise BuildError(f'unsupported source format: {fmt}')
 
+def collapse_networks(networks):
+    unique=set(networks)
+    return sorted(
+        list(ipaddress.collapse_addresses(n for n in unique if n.version==4)) +
+        list(ipaddress.collapse_addresses(n for n in unique if n.version==6)),
+        key=lambda n:(n.version,int(n.network_address),n.prefixlen))
+
+
+def verify_base_retention(base_data, result_g, result_i, inverses, root):
+    """Prove inherited data remains present except explicit personal removals."""
+    from bisect import bisect_right
+    report={}
+    for kind,payload in base_data.items():
+        result=result_g if kind=='geosite' else result_i
+        missing=sorted(set(payload)-set(result))
+        if missing: raise BuildError(f'base {kind} tags lost: {missing}')
+        checked=0; removed=0
+        for tag,original in payload.items():
+            if kind=='geosite':
+                _,removals=custom_domains(root,tag)
+                remove={(t,v) for t,v,_ in removals}
+                expected={(t,normalize_domain(v,t),tuple(sorted(attrs))) for t,v,attrs in original}
+                removed += sum((t,v) in remove for t,v,_ in expected)
+                expected={d for d in expected if d[:2] not in remove}
+                if not expected.issubset(set(result[tag])):
+                    raise BuildError(f'base geosite rules lost: {tag}')
+                checked += len(expected)
+            else:
+                networks,inverse=original
+                if inverses.get(tag,False)!=inverse:
+                    raise BuildError(f'base geoip inverse flag changed: {tag}')
+                _,removals=custom_geoip(root,tag)
+                remove=set(removals)
+                removed += sum(n in remove for n in networks)
+                # Collapsed output is disjoint, so one interval contains each original CIDR.
+                intervals={version:[] for version in (4,6)}
+                for n in result[tag]:
+                    intervals[n.version].append((int(n.network_address),int(n.broadcast_address)))
+                starts={version:[lo for lo,_ in pairs] for version,pairs in intervals.items()}
+                for n in networks:
+                    if n in remove: continue
+                    index=bisect_right(starts[n.version],int(n.network_address))-1
+                    if index<0 or intervals[n.version][index][1]<int(n.broadcast_address):
+                        raise BuildError(f'base geoip coverage lost: {tag}:{n}')
+                    checked += 1
+        report[kind]={'base_tags':len(payload),'retained_tags':len(payload)-len(missing),
+                      'missing_tags':missing,'rules_checked':checked,'explicitly_removed':removed}
+    return report
+
+
 def build(config:dict, output:Path):
     root=Path(config.get('_root','.')); sources=config.get('sources',{}); cache={}; loaded={}; skipped={}
-    for sid,spec in sources.items(): loaded[sid]=load_source(spec,cache)
-    result_g={}; result_i={}
+    for sid,spec in sources.items():
+        loaded[sid]=load_source(spec,cache)
+    base_data={}
+    for kind,sid in config.get('base',{}).items():
+        if kind not in ('geosite','geoip'):
+            raise BuildError(f'unknown base kind: {kind}')
+        if sid not in loaded or loaded[sid][0]!=kind:
+            raise BuildError(f'base {kind} must reference a {kind} source: {sid}')
+        base_data[kind]=loaded[sid][1]
+        if not base_data[kind]: raise BuildError(f'empty base source: {sid}')
+    result_g={}; result_i={}; inverses={}
     for kind in ('geosite','geoip'):
-        for tag, refs in config.get(kind,{}).items():
-            vals_d=[]; vals_i=[]
+        inherited=base_data.get(kind,{})
+        enhancements={}
+        for tag,refs in config.get(kind,{}).items():
+            key=tag.lower()
+            if key in enhancements: raise BuildError(f'duplicate {kind} tag: {tag}')
+            enhancements[key]=refs
+        # No tag allowlist: new upstream categories automatically enter this union.
+        for tag in sorted(set(inherited)|set(enhancements)):
+            refs=enhancements.get(tag,[])
+            vals_d=[]; vals_i=[]; inverse=False
+            if tag in inherited:
+                if kind=='geosite': vals_d=list(inherited[tag])
+                else: vals_i=list(inherited[tag][0]); inverse=inherited[tag][1]
             for ref in refs:
                 sid=ref['source']; up=ref.get('tag',tag); fmt,payload=loaded[sid]; sk={}
                 if kind=='geosite':
@@ -186,11 +256,12 @@ def build(config:dict, output:Path):
                         vals_d += payload[up.lower()]
                     else: raise BuildError(f'geoip source {sid} used for geosite')
                 else:
+                    if inverse: raise BuildError(f'cannot merge into inverse base geoip tag: {tag}')
                     if fmt=='clash': _,c,sk=clash_parse(payload,'geoip'); vals_i += c
                     elif fmt=='geoip':
                         if up.lower() not in payload: raise BuildError(f'missing geoip tag {up} in {sid}')
                         c,inv=payload[up.lower()]
-                        if inv: raise BuildError(f'inverse geoip source {sid}:{up} is unsupported')
+                        if inv: raise BuildError(f'inverse geoip source {sid}:{up} is unsupported for merging')
                         vals_i += c
                     else: raise BuildError(f'geosite source {sid} used for geoip')
                 for k,v in sk.items():
@@ -200,38 +271,48 @@ def build(config:dict, output:Path):
                 a,r=custom_domains(root,tag); vals_d += a; remove={(x[0],x[1]) for x in r}
                 vals_d=[x for x in vals_d if (x[0],normalize_domain(x[1],x[0])) not in remove]
                 vals_d=sorted(set((t,normalize_domain(v,t),tuple(sorted(a))) for t,v,a in vals_d),key=domain_key)
-                if not vals_d: raise BuildError(f'requested geosite tag is empty: {tag}')
-                result_g[tag.lower()]=vals_d
+                if not vals_d and (tag not in inherited or inherited[tag]):
+                    raise BuildError(f'requested geosite tag is empty: {tag}')
+                result_g[tag]=vals_d
             else:
-                a,r=custom_geoip(root,tag); vals_i += a; vals_i=[x for x in vals_i if x not in set(r)]
-                vals_i=list(ipaddress.collapse_addresses([n for n in set(vals_i) if n.version==4])) + list(ipaddress.collapse_addresses([n for n in set(vals_i) if n.version==6]))
-                vals_i=sorted(vals_i,key=lambda n:(n.version,int(n.network_address),n.prefixlen))
-                if not vals_i: raise BuildError(f'requested geoip tag is empty: {tag}')
-                result_i[tag.lower()]=vals_i
-    # aliases point to copied output tags
+                a,r=custom_geoip(root,tag)
+                if inverse and (a or r): raise BuildError(f'cannot modify inverse base geoip tag: {tag}')
+                vals_i += a; remove=set(r); vals_i=[x for x in vals_i if x not in remove]
+                vals_i=collapse_networks(vals_i)
+                if not vals_i and (tag not in inherited or inherited[tag][0]):
+                    raise BuildError(f'requested geoip tag is empty: {tag}')
+                result_i[tag]=vals_i; inverses[tag]=inverse
+    # Aliases may only add new names. They must never replace an inherited category.
     for kind,res in [('geosite',result_g),('geoip',result_i)]:
         for alias,tag in config.get('aliases',{}).get(kind,{}).items():
-            if tag.lower() not in res: raise BuildError(f'alias target missing: {kind}:{tag}')
-            res[alias.lower()]=res[tag.lower()]
+            alias=alias.lower(); tag=tag.lower()
+            if tag not in res: raise BuildError(f'alias target missing: {kind}:{tag}')
+            if alias in res: raise BuildError(f'alias would overwrite existing {kind} tag: {alias}')
+            res[alias]=res[tag]
+            if kind=='geoip': inverses[alias]=inverses[tag]
+    retention=verify_base_retention(base_data,result_g,result_i,inverses,root)
     gs=bytearray(); gi=bytearray()
     for tag,ds in sorted(result_g.items()):
         body=fbytes(1,tag.encode())+b''.join(fbytes(2,encode_domain(d)) for d in ds); gs += fbytes(1,body)
-    gi=bytearray()
     for tag,cs in sorted(result_i.items()):
-        body=fbytes(1,tag.encode())
+        body=bytearray(fbytes(1,tag.encode()))
         for n in cs:
             cidr=fbytes(1,n.network_address.packed)+varint(16)+varint(n.prefixlen)
             body += fbytes(2,cidr)
-        gi += fbytes(1,body)
+        if inverses[tag]: body += varint(24)+varint(1)
+        gi += fbytes(1,bytes(body))
     overlap=[]
     if 'cn' in result_g and 'proxy' in result_g:
         common=set(result_g['cn']) & set(result_g['proxy'])
         overlap=[{'type':t,'value':v,'attrs':[a.hex() for a in attrs]} for t,v,attrs in sorted(common,key=domain_key)]
-    manifest={'sources':{sid:{'url':s['url'],'sha256':hashlib.sha256(fetch(s['url'],cache)).hexdigest()} for sid,s in sources.items()},'counts':{'geosite':{k:len(v) for k,v in result_g.items()},'geoip':{k:len(v) for k,v in result_i.items()}},'skipped':skipped,'overlaps':overlap}
-    # Validate the complete in-memory wire output before replacing any artifact.
+    manifest={'sources':{sid:{'url':s['url'],'sha256':hashlib.sha256(fetch(s['url'],cache)).hexdigest()} for sid,s in sources.items()},
+              'base':config.get('base',{}),'base_retention':retention,
+              'counts':{'geosite':{k:len(v) for k,v in result_g.items()},'geoip':{k:len(v) for k,v in result_i.items()}},
+              'skipped':skipped,'overlaps':overlap}
+    # Validate all categories and entries before replacing any artifact.
     if decode_geosite(bytes(gs)) != result_g:
         raise BuildError('geosite round-trip verification failed')
-    expected_i={tag:(networks,False) for tag,networks in result_i.items()}
+    expected_i={tag:(networks,inverses[tag]) for tag,networks in result_i.items()}
     if decode_geoip(bytes(gi)) != expected_i:
         raise BuildError('geoip round-trip verification failed')
     output.mkdir(parents=True,exist_ok=True)
@@ -244,9 +325,6 @@ def build(config:dict, output:Path):
         for n in ('geosite.dat','geoip.dat','manifest.json','sha256sums.txt'): os.replace(stage/n,output/n)
     finally:
         shutil.rmtree(stage,ignore_errors=True)
-    # reread and verify requested tags
-    if not decode_geosite((output/'geosite.dat').read_bytes()) and result_g: raise BuildError('geosite verification failed')
-    if not decode_geoip((output/'geoip.dat').read_bytes()) and result_i: raise BuildError('geoip verification failed')
     return manifest
 
 def main(argv=None):

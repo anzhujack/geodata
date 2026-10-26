@@ -65,9 +65,14 @@ for kind, msg_name, item_name in [('geosite', 'GeoSiteList', 'domain'), ('geoip'
             else:
                 assert len(item.ip) in (4, 16)
                 assert 0 <= item.prefix <= (32 if len(item.ip) == 4 else 128)
-                assert not entry.reverse_match
     assert counts == manifest['counts'][kind]
     report[kind] = {'tags': len(tags), 'entries': sum(counts.values())}
+    retention=manifest.get('base_retention',{}).get(kind)
+    if retention:
+        assert retention['missing_tags']==[]
+        assert retention['retained_tags']==retention['base_tags']
+        assert len(tags)>=retention['base_tags']
+        report[kind]['inherited_tags']=retention['retained_tags']
 
 workflow = yaml.load((root / '.github/workflows/build.yml').read_text(), Loader=yaml.BaseLoader)
 assert workflow['on']['schedule'][0]['cron'] == '30 0 * * *'

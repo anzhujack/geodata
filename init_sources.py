@@ -25,21 +25,20 @@ for tag in ['cn', 'proxy', 'ads', 'private', 'ai', 'gfw', 'fakeip-filter', 'trac
             'max', 'primevideo', 'appletv', 'youtube', 'tiktok', 'bilibili', 'spotify', 'media',
             'networktest', 'tld-proxy']:
     site[tag] = [ref('dustin-site', tag)]
-loyal = {'cn': 'cn', 'proxy': 'geolocation-!cn', 'ads': 'category-ads-all', 'private': 'private',
-         'ai': 'openai', 'gfw': 'gfw', 'apple-cn': 'apple-cn', 'google-cn': 'google-cn',
-         'netflix': 'netflix', 'disney': 'disney', 'youtube': 'youtube', 'tiktok': 'tiktok',
-         'bilibili': 'bilibili', 'spotify': 'spotify', 'telegram': 'telegram', 'github': 'github',
-         'google': 'google', 'apple': 'apple', 'microsoft': 'microsoft'}
+# Same-name Loyalsoldier categories are inherited automatically.
+loyal = {'proxy': 'geolocation-!cn', 'ads': 'category-ads-all', 'ai': 'openai'}
 for tag, upstream in loyal.items():
     site.setdefault(tag, []).append(ref('loyal-site', upstream))
 for tag in bm:
     site.setdefault(tag, []).append(ref('bm-' + tag))
 ip = {tag: [ref('dustin-ip', tag)] for tag in ['cn', 'private', 'telegram', 'netflix', 'media']}
 for tag in ['cn', 'private', 'telegram', 'netflix']:
-    ip[tag].append(ref('loyal-ip', tag))
-for tag in ['cn', 'private', 'telegram', 'netflix']:
     ip[tag].append(ref('bm-' + tag))
-config = {'sources': sources, 'geosite': site, 'geoip': ip,
-          'aliases': {'geosite': {'geolocation-!cn': 'proxy', 'category-ads-all': 'ads'}, 'geoip': {}}}
-(root / 'sources.json').write_text(json.dumps(config, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+# Explicit enhancement mappings supplement the full base; they do not select base tags.
+site['geolocation-!cn'] = [ref('dustin-site', 'proxy'), ref('bm-proxy')]
+site['category-ads-all'] = [ref('dustin-site', 'ads'), ref('bm-ads')]
+site['openai'] = [ref('bm-ai')]
+config = {'sources': sources, 'base': {'geosite': 'loyal-site', 'geoip': 'loyal-ip'},
+          'geosite': site, 'geoip': ip, 'aliases': {'geosite': {}, 'geoip': {}}}
+(root / 'sources.json').write_text(json.dumps(config, ensure_ascii=False, indent=2) + '\n', encoding='utf-8', newline='\n')
 print('Created sources.json')

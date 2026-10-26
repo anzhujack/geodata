@@ -65,14 +65,14 @@
       "format": "clash"
     }
   },
+  "base": {
+    "geosite": "loyal-site",
+    "geoip": "loyal-ip"
+  },
   "geosite": {
     "cn": [
       {
         "source": "dustin-site",
-        "tag": "cn"
-      },
-      {
-        "source": "loyal-site",
         "tag": "cn"
       },
       {
@@ -111,10 +111,6 @@
         "tag": "private"
       },
       {
-        "source": "loyal-site",
-        "tag": "private"
-      },
-      {
         "source": "bm-private"
       }
     ],
@@ -134,10 +130,6 @@
     "gfw": [
       {
         "source": "dustin-site",
-        "tag": "gfw"
-      },
-      {
-        "source": "loyal-site",
         "tag": "gfw"
       }
     ],
@@ -163,19 +155,11 @@
       {
         "source": "dustin-site",
         "tag": "apple-cn"
-      },
-      {
-        "source": "loyal-site",
-        "tag": "apple-cn"
       }
     ],
     "google-cn": [
       {
         "source": "dustin-site",
-        "tag": "google-cn"
-      },
-      {
-        "source": "loyal-site",
         "tag": "google-cn"
       }
     ],
@@ -203,20 +187,12 @@
         "tag": "netflix"
       },
       {
-        "source": "loyal-site",
-        "tag": "netflix"
-      },
-      {
         "source": "bm-netflix"
       }
     ],
     "disney": [
       {
         "source": "dustin-site",
-        "tag": "disney"
-      },
-      {
-        "source": "loyal-site",
         "tag": "disney"
       },
       {
@@ -247,10 +223,6 @@
         "tag": "youtube"
       },
       {
-        "source": "loyal-site",
-        "tag": "youtube"
-      },
-      {
         "source": "bm-youtube"
       }
     ],
@@ -258,29 +230,17 @@
       {
         "source": "dustin-site",
         "tag": "tiktok"
-      },
-      {
-        "source": "loyal-site",
-        "tag": "tiktok"
       }
     ],
     "bilibili": [
       {
         "source": "dustin-site",
         "tag": "bilibili"
-      },
-      {
-        "source": "loyal-site",
-        "tag": "bilibili"
       }
     ],
     "spotify": [
       {
         "source": "dustin-site",
-        "tag": "spotify"
-      },
-      {
-        "source": "loyal-site",
         "tag": "spotify"
       }
     ],
@@ -304,38 +264,35 @@
     ],
     "telegram": [
       {
-        "source": "loyal-site",
-        "tag": "telegram"
-      },
-      {
         "source": "bm-telegram"
       }
     ],
     "github": [
       {
-        "source": "loyal-site",
-        "tag": "github"
-      },
-      {
         "source": "bm-github"
       }
     ],
-    "google": [
+    "geolocation-!cn": [
       {
-        "source": "loyal-site",
-        "tag": "google"
+        "source": "dustin-site",
+        "tag": "proxy"
+      },
+      {
+        "source": "bm-proxy"
       }
     ],
-    "apple": [
+    "category-ads-all": [
       {
-        "source": "loyal-site",
-        "tag": "apple"
+        "source": "dustin-site",
+        "tag": "ads"
+      },
+      {
+        "source": "bm-ads"
       }
     ],
-    "microsoft": [
+    "openai": [
       {
-        "source": "loyal-site",
-        "tag": "microsoft"
+        "source": "bm-ai"
       }
     ]
   },
@@ -343,10 +300,6 @@
     "cn": [
       {
         "source": "dustin-ip",
-        "tag": "cn"
-      },
-      {
-        "source": "loyal-ip",
         "tag": "cn"
       },
       {
@@ -359,10 +312,6 @@
         "tag": "private"
       },
       {
-        "source": "loyal-ip",
-        "tag": "private"
-      },
-      {
         "source": "bm-private"
       }
     ],
@@ -372,20 +321,12 @@
         "tag": "telegram"
       },
       {
-        "source": "loyal-ip",
-        "tag": "telegram"
-      },
-      {
         "source": "bm-telegram"
       }
     ],
     "netflix": [
       {
         "source": "dustin-ip",
-        "tag": "netflix"
-      },
-      {
-        "source": "loyal-ip",
         "tag": "netflix"
       },
       {
@@ -400,10 +341,7 @@
     ]
   },
   "aliases": {
-    "geosite": {
-      "geolocation-!cn": "proxy",
-      "category-ads-all": "ads"
-    },
+    "geosite": {},
     "geoip": {}
   }
 }

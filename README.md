@@ -1,6 +1,6 @@
 # 个人 Geodata
 
-将 DustinWin、Loyalsoldier 和 blackmatrix7 的指定分类合并，生成标准 V2Ray protobuf 格式的 `geosite.dat` 与 `geoip.dat`，供 dae、honk 等支持这种格式的客户端使用。
+完整继承 Loyalsoldier 的 `geosite.dat` 和 `geoip.dat` 全部分类，再按用途合并 DustinWin 和 blackmatrix7 的补充规则，生成标准 V2Ray protobuf 格式的数据，供 dae、honk 等客户端使用。Loyalsoldier 后续新增的分类会自动继承，无需手工逐个登记。
 
 ## 数据流
 
@@ -26,24 +26,40 @@ https://github.com/anzhujack/geodata/releases/latest/download/sha256sums.txt
 
 本地若要求两个 DAT 一定来自同一次构建，使用附带更新脚本：它只解析一次 Latest，后续下载同一版本标签下的文件，避免恰好发布时两个固定链接跨版本。
 
-## 默认分类
+## 全量基底与增强分类
 
-合并范围由 `sources.json` 显式指定，**并非把所有上游分类和所有规则全部混在一起**。
+`sources.json` 的 `base` 声明如下：
 
-| 类型 | 分类 | 来源和用途 |
+```json
+"base": {
+  "geosite": "loyal-site",
+  "geoip": "loyal-ip"
+}
+```
+
+每次构建会读取这两个源中的**全部分类**，包括各服务、分类集合、各国家/地区和 ASN 等具名 IP 集合，按上游实际内容继承。`geosite`、`geoip` 下列出的数组仅是**增强映射**，不再是最终输出的分类白名单。未列入增强映射的 Loyalsoldier 分类照常输出；上游新增分类也自动进入产物。
+
+保留 Loyalsoldier 原有分类名称、域名匹配类型和属性。域名在同一分类内去重，IP 可合并为覆盖相同地址集合的网段，因此不是字节原样复制。发布前会检查全部原始标签、域名规则和 IP 地址覆盖是否仍在，结果写入 `manifest.json` 的 `base_retention`；只有你明确写在个人 `.remove.txt` 中的条目可以例外移除。新增别名不得覆盖任何已有标签。
+
+主要增强关系如下，其余分类由 Loyalsoldier 全量提供：
+
+| 类型 | 分类 | 增强方式 |
 | --- | --- | --- |
-| geosite | cn、proxy、ads、private | DustinWin + Loyalsoldier + blackmatrix7；分别为国内、国外、广告、私有域名 |
+| geosite | cn、private | 在 Loyalsoldier 原分类上合并 DustinWin 与 blackmatrix7 |
+| geosite | geolocation-!cn | 保留原名及原规则，合并 DustinWin proxy 与 blackmatrix7 Global |
+| geosite | category-ads-all | 保留原名及原规则，合并 DustinWin ads 与 blackmatrix7 Advertising |
+| geosite | proxy、ads | 继续提供上一版短名称分类，分别汇总相同的代理/广告来源 |
 | geosite | ai | DustinWin AI + Loyalsoldier OpenAI + blackmatrix7 OpenAI |
+| geosite | openai | 保留 Loyalsoldier OpenAI 原分类，仅补充 blackmatrix7 OpenAI，不混入整个 ai 分类 |
 | geosite | telegram、github | Loyalsoldier + blackmatrix7 |
 | geosite | youtube、netflix、disney | 三方同类域名合并 |
-| geosite | games、games-cn | DustinWin + blackmatrix7 Game / GameDownloadCN |
-| geosite | apple-cn、google-cn | DustinWin + Loyalsoldier |
-| geosite | microsoft-cn、gfw、fakeip-filter、trackerslist、max、primevideo、appletv、tiktok、bilibili、spotify、media、networktest、tld-proxy | 见配置中的具体映射；部分叠加 Loyalsoldier |
-| geosite | google、apple、microsoft | Loyalsoldier 的完整服务分类，与对应 `*-cn` 分类用途不同 |
-| geoip | cn、private、telegram、netflix | 三方同类 CIDR 合并 |
-| geoip | media | DustinWin |
+| geosite | games、games-cn | 继承存在的同名基底分类，再补充 DustinWin + blackmatrix7 Game / GameDownloadCN |
+| geosite | apple-cn、google-cn | Loyalsoldier + DustinWin |
+| geosite | microsoft-cn、gfw、fakeip-filter、trackerslist、max、primevideo、appletv、tiktok、bilibili、spotify、media、networktest、tld-proxy | 保留同名基底（若有），按配置补充 DustinWin |
+| geoip | cn、private、telegram、netflix | 原分类合并 DustinWin 与 blackmatrix7 的对应 CIDR |
+| geoip | media | 保留同名基底（若有），补充 DustinWin |
 
-另提供 `geolocation-!cn → proxy`、`category-ads-all → ads` 两个兼容别名。构建只保证配置中列出的分类存在，旧配置引用其他标签时需补充映射。
+`proxy` 与 `geolocation-!cn`、`ads` 与 `category-ads-all` 现在是各自独立的增强分类，不通过别名覆盖原始标签；个人增删只影响指定的那个名称。如果只使用 Loyalsoldier 的标准名称，就编辑对应标准名称的个人文件。DustinWin 与 blackmatrix7 的补充范围仍由增强映射明确控制，不扫描 blackmatrix7 仓库中与 DAT 无关的进程、端口等规则。
 
 ### 去重与冲突
 
@@ -78,7 +94,7 @@ regexp:^.+\.example\.org$
 
 无前缀的域名按后缀匹配。增删只影响文件名对应的分类，删除按“匹配类型 + 值”精确删除，不能用删除子域名来抵消上游的父域后缀。例如删除 `full:api.example.com` 不会撤销 `domain:example.com`；这种例外应放在客户端前置规则中。IP 删除也是精确 CIDR 条目删除，不执行从大网段挖掉小网段的集合差操作。
 
-修改现有分类只需新增对应文件。若要创建全新分类，先在 `sources.json` 对应类型下增加该标签的空来源数组，再添加其 `.add.txt`，使最终分类非空。别名在基础分类构建之后复制；请修改基础分类。
+修改现有分类只需新增对应文件，包括未在增强映射中列出的 Loyalsoldier 继承分类。例如可直接建立 `custom/geosite/steam.add.txt` 或 `custom/geoip/us.remove.txt`。若要创建基底中也不存在的全新分类，先在 `sources.json` 对应类型下增加该标签的空来源数组，再添加其 `.add.txt`，使最终分类非空。别名在基础分类构建之后复制；请修改基础分类。
 
 `init_sources.py` 是初始来源配置生成工具；日常只编辑 `sources.json`，**不要再次运行初始化工具覆盖自己的修改**。
 
