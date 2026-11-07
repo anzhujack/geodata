@@ -79,32 +79,6 @@
         "source": "bm-cn"
       }
     ],
-    "proxy": [
-      {
-        "source": "dustin-site",
-        "tag": "proxy"
-      },
-      {
-        "source": "loyal-site",
-        "tag": "geolocation-!cn"
-      },
-      {
-        "source": "bm-proxy"
-      }
-    ],
-    "ads": [
-      {
-        "source": "dustin-site",
-        "tag": "ads"
-      },
-      {
-        "source": "loyal-site",
-        "tag": "category-ads-all"
-      },
-      {
-        "source": "bm-ads"
-      }
-    ],
     "private": [
       {
         "source": "dustin-site",
