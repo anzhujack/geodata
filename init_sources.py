@@ -38,6 +38,10 @@ for tag in ['cn', 'private', 'telegram', 'netflix']:
 site['geolocation-!cn'] = [ref('dustin-site', 'proxy'), ref('bm-proxy')]
 site['category-ads-all'] = [ref('dustin-site', 'ads'), ref('bm-ads')]
 site['openai'] = [ref('bm-ai')]
+# 短名称 ads / proxy 与标准名称的含义逐一相同，产物里同时存在只是体积翻倍，
+# 因此增强映射里不再保留这两个名字（标准名 geolocation-!cn / category-ads-all 仍由上面两行生成）。
+site.pop('proxy', None)
+site.pop('ads', None)
 config = {'sources': sources, 'base': {'geosite': 'loyal-site', 'geoip': 'loyal-ip'},
           'geosite': site, 'geoip': ip, 'aliases': {'geosite': {}, 'geoip': {}}}
 (root / 'sources.json').write_text(json.dumps(config, ensure_ascii=False, indent=2) + '\n', encoding='utf-8', newline='\n')

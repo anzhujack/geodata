@@ -58,7 +58,6 @@ sha256sum -c geoip.dat.sha256
 | geosite | private | 在 Loyalsoldier private 上合并 DustinWin 与 blackmatrix7 Lan |
 | geosite | geolocation-!cn | 保留原名及原规则，合并 DustinWin proxy 与 blackmatrix7 Global |
 | geosite | category-ads-all | 保留原名及原规则，合并 DustinWin ads 与 blackmatrix7 Advertising |
-| geosite | proxy、ads | 继续提供上一版短名称分类，分别汇总相同的代理/广告来源 |
 | geosite | ai | DustinWin AI + Loyalsoldier 完整 category-ai-!cn + blackmatrix7 OpenAI |
 | geosite | openai | 保留 Loyalsoldier OpenAI 原分类，仅补充 blackmatrix7 OpenAI，不混入整个 ai 分类 |
 | geosite | telegram、github | Loyalsoldier + blackmatrix7 |
@@ -70,7 +69,27 @@ sha256sum -c geoip.dat.sha256
 | geoip | private、telegram、netflix | 原分类合并 DustinWin 与 blackmatrix7 的对应 CIDR |
 | geoip | media | 保留同名基底（若有），补充 DustinWin |
 
-`proxy` 与 `geolocation-!cn`、`ads` 与 `category-ads-all` 现在是各自独立的增强分类，不通过别名覆盖原始标签；个人增删只影响指定的那个名称。如果只使用 Loyalsoldier 的标准名称，就编辑对应标准名称的个人文件。DustinWin 与 blackmatrix7 的补充范围仍由增强映射明确控制，不扫描 blackmatrix7 仓库中与 DAT 无关的进程、端口等规则。
+`geolocation-!cn` 与 `category-ads-all` 是标准名称，个人增删请编辑这两个名字对应的文件。上一版同时提供的短名称 `proxy`、`ads` 已移除：它们的合并内容与标准名称逐条相同，同时存在会让产物多出约 8 MB 而分流结果不变。若你的客户端配置里写着 `geosite:proxy` 或 `geosite:ads`，请改成对应的标准名称——dae 遇到不存在的 geosite 标签会直接拒绝加载。DustinWin 与 blackmatrix7 的补充范围仍由增强映射明确控制，不扫描 blackmatrix7 仓库中与 DAT 无关的进程、端口等规则。
+
+### Telegram 地域分类
+
+`geoip` 额外提供 `telegram-sg`、`telegram-us`、`telegram-eu` 三个分类，把 Telegram 自己的网段按**机房所在地**拆开，便于让不同区域的连接走就近出口（例如新加坡走 SG 节点、迈阿密走 US 节点）。
+
+- 网段来源：官方 <https://core.telegram.org/resources/cidr.txt> 的 CIDR，加上 AS59930、AS62041、AS62014、AS44907、AS211157 在 RIPE Stat 的宣告前缀，取并集后按 `/24` 逐个定位。
+- 定位方式：每个 `/24` 取 3 个采样 IP 查 ipinfo.io 与 ipwho.is 交叉验证；ip-api 对 Telegram 的归属与这两家大量冲突（把新加坡、迈阿密都标成荷兰），未采用。
+- 结果：`telegram-sg` 2560 IP、`telegram-us` 2048 IP、`telegram-eu` 5632 IP。与 Telegram 公开的 DC 布局一致：DC1/DC3 在迈阿密、DC2/DC4 在阿姆斯特丹、DC5 在新加坡。
+- 未纳入：俄罗斯（`91.108.11.0/24`、`95.161.66-75`、`95.161.77-79`）、印度（`91.108.20.0/22`，孟买）、安提瓜（`149.154.160.0/24`）。这些地址仍由 `geoip:telegram` 兜底，不会漏路由。
+- 只覆盖 IPv4。Telegram 的 IPv6 网段（`2001:b28:f23c::/48` 等）未拆分，需要时仍用 `geoip:telegram`。
+- 使用时三条地域规则必须排在 `dip(geoip:telegram)` 之前，否则会被宽泛的 telegram 先吃掉：
+
+```text
+routing {
+  dip(geoip:telegram-sg) -> sg_group
+  dip(geoip:telegram-us) -> us_group
+  dip(geoip:telegram-eu) -> eu_group
+  dip(geoip:telegram) -> telegram_group
+}
+```
 
 ### AI 分类覆盖
 
@@ -139,11 +158,11 @@ regexp:^.+\.example\.org$
 routing {
   dip(geoip:private) -> direct
   domain(geosite:private) -> direct
-  # 将个人白名单/例外放在广告及宽泛分类前。
-  domain(geosite:ads) -> block
+  # 先拦广告，再把个人白名单/例外放在宽泛分类之前。
+  domain(geosite:category-ads-all) -> block
   domain(geosite:microsoft-cn, geosite:apple-cn, geosite:google-cn, geosite:games-cn) -> direct
   domain(geosite:ai, geosite:telegram, geosite:youtube) -> my_proxy
-  domain(geosite:proxy) -> my_proxy
+  domain(geosite:geolocation-!cn) -> my_proxy
   domain(geosite:cn) -> direct
   dip(geoip:telegram) -> my_proxy
   dip(geoip:cn) -> direct

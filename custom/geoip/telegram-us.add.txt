@@ -1,0 +1,9 @@
+# geoip:telegram-us
+# 美国 DC（91.108.12.0/22 迈阿密、149.154.172.0/22）
+# 依据：core.telegram.org/resources/cidr.txt + AS59930/AS62041/AS62014/AS44907/AS211157 的 RIPE Stat 宣告前缀，
+#       逐个 /24 取 3 个采样 IP，经 ipinfo.io / ipwho.is 交叉定位（ip-api 误差大，未采用）
+# Telegram 美国机房（AS59930/AS62041），迈阿密/华盛顿
+# 俄罗斯、印度、安提瓜的地址不在本文件内，由 geoip:telegram 兜底
+# 重新生成：python tools/telegram_regions.py
+91.108.12.0/22
+149.154.172.0/22

@@ -1,0 +1,10 @@
+# geoip:telegram-sg
+# 新加坡 DC（91.108.16.0/22、91.108.56.0/23、149.154.168.0/22）
+# 依据：core.telegram.org/resources/cidr.txt + AS59930/AS62041/AS62014/AS44907/AS211157 的 RIPE Stat 宣告前缀，
+#       逐个 /24 取 3 个采样 IP，经 ipinfo.io / ipwho.is 交叉定位（ip-api 误差大，未采用）
+# Telegram 新加坡机房（AS62014）
+# 俄罗斯、印度、安提瓜的地址不在本文件内，由 geoip:telegram 兜底
+# 重新生成：python tools/telegram_regions.py
+91.108.16.0/22
+91.108.56.0/23
+149.154.168.0/22
