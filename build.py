@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build V2Ray geosite.dat and geoip.dat from JSON source definitions."""
 from __future__ import annotations
-import argparse, hashlib, ipaddress, json, os, re, shutil, tempfile, urllib.error, urllib.request
+import argparse, hashlib, ipaddress, json, os, re, shutil, tempfile, time, urllib.error, urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -154,10 +154,13 @@ def custom_geoip(root:Path, tag:str):
 def fetch(url:str, cache:dict):
     if url in cache: return cache[url]
     last=None
-    for i in range(3):
+    # GitHub 的 release 下载端点偶尔整段返回 504，立刻重试只会撞到同一个故障。
+    # 退避几轮，覆盖十几秒的抖动；仍失败才算上游真的挂了。
+    for delay in (0, 3, 8, 20, 45):
+        if delay: time.sleep(delay)
         try:
             req=urllib.request.Request(url,headers={'User-Agent':'personal-geodata/1.0'})
-            with urllib.request.urlopen(req,timeout=20) as r: b=r.read()
+            with urllib.request.urlopen(req,timeout=45) as r: b=r.read()
             cache[url]=b; return b
         except (OSError,urllib.error.URLError) as e: last=e
     raise BuildError(f'failed to fetch {url}: {last}')
