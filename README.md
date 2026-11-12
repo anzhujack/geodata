@@ -71,6 +71,16 @@ sha256sum -c geoip.dat.sha256
 
 `geolocation-!cn` 与 `category-ads-all` 是标准名称，个人增删请编辑这两个名字对应的文件。上一版同时提供的短名称 `proxy`、`ads` 已移除：它们的合并内容与标准名称逐条相同，同时存在会让产物多出约 8 MB 而分流结果不变。若你的客户端配置里写着 `geosite:proxy` 或 `geosite:ads`，请改成对应的标准名称——dae 遇到不存在的 geosite 标签会直接拒绝加载。DustinWin 与 blackmatrix7 的补充范围仍由增强映射明确控制，不扫描 blackmatrix7 仓库中与 DAT 无关的进程、端口等规则。
 
+### Discord 分类
+
+`geoip` 额外提供 `discord`，把 Discord 自己的地址块和语音 anycast 段单独列出，供客户端按 IP 分流。Discord 的网页和 WebSocket 走 Cloudflare（`162.159.x.x`），按域名规则就能覆盖；但**语音是 UDP**、连的是 IP，没有域名可供嗅探，只能靠 IP 段兜底。
+
+- 自有块（RIPE RDAP）：Discord Inc. 的 `66.22.192.0/18`、`195.62.89.0/24`、`2a0e:5940::/29`，以及 Discord Netherlands B.V. 的 `188.244.120.0/24`、`2a11:4cc0::/29`。
+- 语音 anycast：Discord 语音服务器对外地址在 `66.22.0.0/17`，该块 ARIN 注册名为 RADWARE-CLOUD-SERVICES，由 Radware（AS25773）以 `/24` 粒度宣告。脚本取 RIPE Stat 中该池内当前被宣告的前缀，合并成不可再合并的网段。
+- 注意 `66.22.0.0/17` 是 Radware 的注册块，可能同时承载别的客户；只取宣告中的段可以缩小误伤面，但仍不是 100% 精确。介意的话把 `dip(geoip:discord)` 只用于 UDP 端口 50000-65535。
+- 自动化：`tools/discord_asn.py` 在每次 GitHub 构建前重新拉取（见工作流 `Refresh Discord ASN geoip list`），失败时沿用仓库里的旧清单并在 Actions 留 warning。本地手动刷新：`python tools/discord_asn.py`，只比对：`python tools/discord_asn.py --check`。
+- 客户端里 `dip(geoip:discord)` 要放在 `dip(geoip:cn)` 等宽泛 IP 兜底之前。
+
 ### Telegram 地域分类
 
 `geoip` 额外提供 `telegram-sg`、`telegram-us`、`telegram-eu` 三个分类，把 Telegram 自己的网段按**机房所在地**拆开，便于让不同区域的连接走就近出口（例如新加坡走 SG 节点、迈阿密走 US 节点）。
