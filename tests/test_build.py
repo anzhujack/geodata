@@ -1,5 +1,6 @@
 import importlib.util
 import ipaddress
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -25,6 +26,23 @@ class BuildTests(unittest.TestCase):
 
     def build(self, cfg):
         return b.build({**cfg, '_root': str(self.root)}, self.output)
+
+    def test_singbox_ad_source_filters_and_reports(self):
+        raw = json.dumps({'version': 5, 'rules': [
+            {'domain_suffix': ['ads.example.org', 'T.CO.', 't.me', 'zijieapi.com', 'com', '127.0.0.1']},
+            {'domain_regex': ['.*']},
+        ]}).encode()
+        config = {'sources': {'ads': self.source('ads.json', raw, 'singbox-ads')},
+                  'geosite': {'category-ads-all': [{'source': 'ads'}]}}
+        manifest = self.build(config)
+        self.assertEqual(b.decode_geosite((self.output / 'geosite.dat').read_bytes()),
+                         {'category-ads-all': [(b.ROOT_DOMAIN, 'ads.example.org', ())]})
+        self.assertEqual(manifest['skipped'], {'ads:protected_suffix': 3,
+                                              'ads:invalid_suffix': 2, 'ads:domain_regex': 1})
+
+    def test_singbox_ad_source_rejects_compound_rules(self):
+        with self.assertRaises(b.BuildError):
+            b.singbox_ad_domains(b'{"version":5,"rules":[{"domain_suffix":["example.org"],"invert":true}]}')
 
     def site_source(self, domains):
         return self.site_bundle({'cn': domains})

@@ -71,6 +71,11 @@ sha256sum -c geoip.dat.sha256
 
 `geolocation-!cn` 与 `category-ads-all` 是标准名称，个人增删请编辑这两个名字对应的文件。上一版同时提供的短名称 `proxy`、`ads` 已移除：它们的合并内容与标准名称逐条相同，同时存在会让产物多出约 8 MB 而分流结果不变。若你的客户端配置里写着 `geosite:proxy` 或 `geosite:ads`，请改成对应的标准名称——dae 遇到不存在的 geosite 标签会直接拒绝加载。DustinWin 与 blackmatrix7 的补充范围仍由增强映射明确控制，不扫描 blackmatrix7 仓库中与 DAT 无关的进程、端口等规则。
 
+### 精准广告补漏
+
+- `category-ads-all` 每次构建都会从 [moiudev/rule-set](https://github.com/moiudev/rule-set) 拉取 `ads.json`，只合并可转换的域名后缀，不引入正则或其他规则集。导入时排除会命中已知短链（如 `t.co`、`t.me`、`bit.ly`）和番茄正文、听书接口的后缀；发布前再检查两个广告分类，防止其他上游误拦这些已知域名。过滤数量和上游文件 SHA256 见 `manifest.json`。这不是全站误杀保证。
+- `category-ads` 只补充番茄小说试拦用的 9 个精确广告主机，不合并大名单。手机试用时自动弹出的广告消失，主动点击后播放的广告仍可能出现。
+
 ### Discord 分类
 
 `geoip` 额外提供 `discord`，把 Discord 自己的地址块和语音 anycast 段单独列出，供客户端按 IP 分流。Discord 的网页和 WebSocket 走 Cloudflare（`162.159.x.x`），按域名规则就能覆盖；但**语音是 UDP**、连的是 IP，没有域名可供嗅探，只能靠 IP 段兜底。

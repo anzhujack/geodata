@@ -165,10 +165,51 @@ def fetch(url:str, cache:dict):
         except (OSError,urllib.error.URLError) as e: last=e
     raise BuildError(f'failed to fetch {url}: {last}')
 
+# Known functional hosts to keep reachable in both published ad categories.
+AD_PROTECTED = (
+    't.co', 't.me', 'bit.ly', 'tinyurl.com', 'linktr.ee', 'youtu.be',
+    's.click.taobao.com', 'zijieapi.com', 'bsync3-normal-lq.zijieapi.com',
+    'fqnovel.com', 'api5-normal-sinfonlinea.fqnovel.com',
+    'lf3-reading.fqnovelpic.com', 'v3-fq-tts.fqnovelvod.com',
+)
+
+
+def singbox_ad_domains(raw):
+    """Import only simple DNS suffixes; never reinterpret sing-box regexes."""
+    data=json.loads(raw)
+    if not isinstance(data,dict) or data.get('version')!=5 or not isinstance(data.get('rules'),list):
+        raise BuildError('unexpected sing-box ad rule-set schema')
+    protected_suffixes={'.'.join(h.split('.')[i:]) for h in AD_PROTECTED for i in range(len(h.split('.')))}
+    skipped={}
+    result=[]
+    valid=re.compile(r'(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?')
+    for rule in data['rules']:
+        if not isinstance(rule,dict) or len(rule)!=1:
+            raise BuildError('unsupported compound sing-box ad rule')
+        key,values=next(iter(rule.items()))
+        if key not in ('domain_suffix','domain_regex') or not isinstance(values,list) or not all(isinstance(x,str) for x in values):
+            raise BuildError(f'unsupported sing-box ad rule: {key}')
+        if key=='domain_regex':
+            skipped[key]=skipped.get(key,0)+len(values)
+            continue
+        for value in values:
+            host=normalize_domain(value,ROOT_DOMAIN)
+            reason=None
+            if not valid.fullmatch(host) or host.rsplit('.',1)[-1].isdigit(): reason='invalid_suffix'
+            elif host in protected_suffixes: reason='protected_suffix'
+            if reason:
+                skipped[reason]=skipped.get(reason,0)+1
+            else:
+                result.append((ROOT_DOMAIN,host,()))
+    if not result: raise BuildError('sing-box ad rule-set has no usable suffixes')
+    return result,skipped
+
+
 def load_source(spec, cache):
     raw=fetch(spec['url'],cache)
     fmt=spec.get('format','geosite')
     if fmt=='clash': return ('clash',raw.decode('utf-8'))
+    if fmt=='singbox-ads': return ('singbox-ads',singbox_ad_domains(raw))
     if fmt=='geosite': return ('geosite',decode_geosite(raw))
     if fmt=='geoip': return ('geoip',decode_geoip(raw))
     raise BuildError(f'unsupported source format: {fmt}')
@@ -254,6 +295,9 @@ def build(config:dict, output:Path):
                 sid=ref['source']; up=ref.get('tag',tag); fmt,payload=loaded[sid]; sk={}
                 if kind=='geosite':
                     if fmt=='clash': d,_,sk=clash_parse(payload,'geosite'); vals_d += d
+                    elif fmt=='singbox-ads':
+                        if tag!='category-ads-all': raise BuildError('sing-box ads may only supplement category-ads-all')
+                        d,sk=payload; vals_d += d
                     elif fmt=='geosite':
                         if up.lower() not in payload: raise BuildError(f'missing geosite tag {up} in {sid}')
                         vals_d += payload[up.lower()]

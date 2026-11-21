@@ -47,6 +47,8 @@ jobs:
         run: python tools/discord_asn.py --check || python tools/discord_asn.py || echo "::warning::Discord ASN 刷新失败，沿用仓库内旧清单"
       - name: Fetch, merge and validate
         run: python build.py --config sources.json --output dist
+      - name: Verify ad rules do not block protected hosts
+        run: python tools/check_ads.py dist/geosite.dat
       - name: Verify checksums
         working-directory: dist
         run: |

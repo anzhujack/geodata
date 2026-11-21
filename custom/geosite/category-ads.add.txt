@@ -1,0 +1,11 @@
+# Fanqie trial: exact advertising hosts only; do not block zijieapi.com wholesale.
+# Candidates from https://github.com/moiudev/rule-set; not a whole-list import.
+full:ad.zijieapi.com
+full:ads3-normal-lf.zijieapi.com
+full:ads3-normal-lq.zijieapi.com
+full:ads3-normal-xh.zijieapi.com
+full:ads3-normal-zb.zijieapi.com
+full:ads5-normal-hj.zijieapi.com
+full:ads5-normal-lf.zijieapi.com
+full:ads5-normal-lq.zijieapi.com
+full:ads5-normal-xh.zijieapi.com
