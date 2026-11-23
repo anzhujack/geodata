@@ -1,0 +1,15 @@
+# 韩系通讯/内容（Kakao/ Daum 系）：yfamilys 的 KakaoTalk 清单里、我们 category-communication 缺的部分
+# 只收主体域名，跳过各家经纪公司/保险/购物这些小站
+kakao.com
+kakao.co.kr
+kakaocdn.net
+kakaocorp.com
+kakaotalk.jp
+kakaopay.com
+kakaobank.com
+kakaocloud.com
+kakaoenterprise.com
+daum.net
+daumcdn.net
+melon.com
+zigzag.kr

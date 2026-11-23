@@ -1,0 +1,13 @@
+# Google 品牌域补充（yfamilies Google/AMP 清单里我们分类没覆盖的母公司品牌域）
+abc.xyz
+amp.dev
+ampproject.com
+ampproject.net
+ampproject.org
+androidtv.com
+crbug.com
+crrev.com
+googlescholar.com
+capitalg.com
+waymo.com
+verily.com

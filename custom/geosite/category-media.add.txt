@@ -1,0 +1,28 @@
+# 海外媒体补充（参照 yfamilys 的 Dailymotion / Plex / TIDAL / Deezer / SoundCloud / Vimeo / Disney / Hulu 清单）
+# 只收总部分别在美/欧、且用美国住宅出口没问题的服务；日韩台本地媒体（abema、bahamut 等）不放这里，避免出口错配
+dailymotion.com
+dai.ly
+dmcdn.net
+dm-event.net
+plex.tv
+plex.com
+plex.services
+plexapp.com
+tidal.com
+tidalhifi.com
+wimpmusic.com
+deezer.com
+dzcdn.net
+soundcloud.com
+sndcdn.com
+soundcloud.cloud
+p-cdn.us
+bandcamp.com
+bcbits.com
+vhx.tv
+livestream.com
+bamgrid.com
+bamtech.net
+callhulu.com
+abc.com
+abcnews.com
