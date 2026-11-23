@@ -1,0 +1,18 @@
+# category-netdisk-!cn 补充：PikPak 全量域名 + 迅雷 sandai 加速通道
+# 上游 netdisk 分类的 pikpak 只有 mypikpak.com/net、pikpak.io/me、pikpakdrive.com 五条
+domain:mypikpak.com
+domain:mypikpak.net
+domain:pikpak.io
+domain:pikpak.me
+domain:pikpakdrive.com
+domain:pikpak.com
+domain:pikpak.app
+domain:pikpakapp.com
+domain:pikpakcloud.com
+# PikPak 加速/云下载通道（sandai.net 国内节点），漏掉会被 geoip:cn 判成直连
+domain:hub5pn.wap.sandai.net
+domain:hub5pnc.sandai.net
+domain:hub5pr.v6.phub.sandai.net
+domain:hub5idx.v6.shub.sandai.net
+domain:hubciddata.sandai.net
+domain:dlandroid.rcv.sandai.net

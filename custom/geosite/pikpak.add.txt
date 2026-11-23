@@ -1,0 +1,20 @@
+# PikPak 完整清单（geosite 上游的 pikpak 分类只有 5 条，moiudev/上游经常缺）
+# 自营域名
+domain:mypikpak.com
+domain:mypikpak.net
+domain:pikpak.io
+domain:pikpak.me
+domain:pikpakdrive.com
+domain:pikpak.com
+domain:pikpak.app
+domain:pikpakapp.com
+domain:pikpakcloud.com
+# PikPak 的加速/云下载通道跑在迅雷 sandai.net 的国内节点上（实测 hub5pn.wap.sandai.net → 125.64.134.135、
+# hubciddata.sandai.net → 218.91.170.90 都是国内 IP）。漏掉这些会被 dip(geoip:cn) 判成国内直连，
+# 表现就是 App 里提示"中国大陆不可用"。只钉 PikPak 用到的具体主机，不整段收 sandai.net，免得影响迅雷本体。
+domain:hub5pn.wap.sandai.net
+domain:hub5pnc.sandai.net
+domain:hub5pr.v6.phub.sandai.net
+domain:hub5idx.v6.shub.sandai.net
+domain:hubciddata.sandai.net
+domain:dlandroid.rcv.sandai.net
