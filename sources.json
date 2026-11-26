@@ -67,6 +67,102 @@
     "bm-games-cn": {
       "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Game/GameDownloadCN/GameDownloadCN.list",
       "format": "clash"
+    },
+    "pt-lan-domain": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/LAN_Domain.yaml",
+      "format": "classical"
+    },
+    "pt-lan-ip": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/LAN_IP.yaml",
+      "format": "classical"
+    },
+    "pt-ntp-domain": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/NTP_Domain.yaml",
+      "format": "classical"
+    },
+    "pt-google-domain": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Google_Domain.yaml",
+      "format": "classical"
+    },
+    "pt-google-ip": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Google_IP.yaml",
+      "format": "classical"
+    },
+    "pt-apple-domain": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Apple_Domain.yaml",
+      "format": "classical"
+    },
+    "pt-apple-ip": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Apple_IP.yaml",
+      "format": "classical"
+    },
+    "pt-netflix-domain": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Netflix_Domain.yaml",
+      "format": "classical"
+    },
+    "pt-netflix-ip": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Netflix_IP.yaml",
+      "format": "classical"
+    },
+    "pt-disney-domain": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Disney_Domain.yaml",
+      "format": "classical"
+    },
+    "pt-emby-domain": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Emby_Domain.yaml",
+      "format": "classical"
+    },
+    "pt-tiktok-domain": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/TikTok_Domain.yaml",
+      "format": "classical"
+    },
+    "pt-spotify-domain": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Spotify_Domain.yaml",
+      "format": "classical"
+    },
+    "pt-spotify-ip": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Spotify_IP.yaml",
+      "format": "classical"
+    },
+    "pt-telegram-domain": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Telegram_Domain.yaml",
+      "format": "classical"
+    },
+    "pt-telegram-ip": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Telegram_IP.yaml",
+      "format": "classical"
+    },
+    "pt-meta-domain": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Meta_Domain.yaml",
+      "format": "classical"
+    },
+    "pt-meta-ip": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Meta_IP.yaml",
+      "format": "classical"
+    },
+    "pt-twitter-domain": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Twitter_Domain.yaml",
+      "format": "classical"
+    },
+    "pt-twitter-ip": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Twitter_IP.yaml",
+      "format": "classical"
+    },
+    "pt-ai-domain": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/AI_Domain.yaml",
+      "format": "classical"
+    },
+    "pt-ai-ip": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/AI_IP.yaml",
+      "format": "classical"
+    },
+    "pt-domestic-domain": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Domestic-Direct_Domain.yaml",
+      "format": "classical"
+    },
+    "pt-domestic-ip": {
+      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Domestic-Direct_IP.yaml",
+      "format": "classical"
     }
   },
   "base": {
@@ -81,6 +177,9 @@
       },
       {
         "source": "bm-cn"
+      },
+      {
+        "source": "pt-domestic-domain"
       }
     ],
     "private": [
@@ -90,6 +189,9 @@
       },
       {
         "source": "bm-private"
+      },
+      {
+        "source": "pt-lan-domain"
       }
     ],
     "ai": [
@@ -103,6 +205,9 @@
       },
       {
         "source": "bm-ai"
+      },
+      {
+        "source": "pt-ai-domain"
       }
     ],
     "gfw": [
@@ -166,6 +271,9 @@
       },
       {
         "source": "bm-netflix"
+      },
+      {
+        "source": "pt-netflix-domain"
       }
     ],
     "disney": [
@@ -175,6 +283,9 @@
       },
       {
         "source": "bm-disney"
+      },
+      {
+        "source": "pt-disney-domain"
       }
     ],
     "max": [
@@ -208,6 +319,9 @@
       {
         "source": "dustin-site",
         "tag": "tiktok"
+      },
+      {
+        "source": "pt-tiktok-domain"
       }
     ],
     "bilibili": [
@@ -220,6 +334,9 @@
       {
         "source": "dustin-site",
         "tag": "spotify"
+      },
+      {
+        "source": "pt-spotify-domain"
       }
     ],
     "media": [
@@ -243,6 +360,9 @@
     "telegram": [
       {
         "source": "bm-telegram"
+      },
+      {
+        "source": "pt-telegram-domain"
       }
     ],
     "github": [
@@ -275,6 +395,36 @@
       {
         "source": "bm-ai"
       }
+    ],
+    "ntp": [
+      {
+        "source": "pt-ntp-domain"
+      }
+    ],
+    "google": [
+      {
+        "source": "pt-google-domain"
+      }
+    ],
+    "apple": [
+      {
+        "source": "pt-apple-domain"
+      }
+    ],
+    "emby": [
+      {
+        "source": "pt-emby-domain"
+      }
+    ],
+    "meta": [
+      {
+        "source": "pt-meta-domain"
+      }
+    ],
+    "x": [
+      {
+        "source": "pt-twitter-domain"
+      }
     ]
   },
   "geoip": {
@@ -285,6 +435,9 @@
       },
       {
         "source": "bm-cn"
+      },
+      {
+        "source": "pt-domestic-ip"
       }
     ],
     "private": [
@@ -294,6 +447,9 @@
       },
       {
         "source": "bm-private"
+      },
+      {
+        "source": "pt-lan-ip"
       }
     ],
     "telegram": [
@@ -303,6 +459,9 @@
       },
       {
         "source": "bm-telegram"
+      },
+      {
+        "source": "pt-telegram-ip"
       }
     ],
     "telegram-sg": [],
@@ -316,12 +475,45 @@
       },
       {
         "source": "bm-netflix"
+      },
+      {
+        "source": "pt-netflix-ip"
       }
     ],
     "media": [
       {
         "source": "dustin-ip",
         "tag": "media"
+      }
+    ],
+    "google": [
+      {
+        "source": "pt-google-ip"
+      }
+    ],
+    "apple": [
+      {
+        "source": "pt-apple-ip"
+      }
+    ],
+    "spotify": [
+      {
+        "source": "pt-spotify-ip"
+      }
+    ],
+    "meta": [
+      {
+        "source": "pt-meta-ip"
+      }
+    ],
+    "twitter": [
+      {
+        "source": "pt-twitter-ip"
+      }
+    ],
+    "ai": [
+      {
+        "source": "pt-ai-ip"
       }
     ]
   },

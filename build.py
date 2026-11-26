@@ -125,6 +125,35 @@ def clash_parse(text:str, target:str):
             except ValueError as e: raise BuildError(f'invalid CIDR: {val}') from e
     return domains,cidrs,skipped
 
+def classical_payload(text:str)->list[str]:
+    """Return the rule lines of a mihomo classical rule-provider (payload: [...]) file."""
+    rules=[]; in_payload=False
+    for lineno,raw in enumerate(text.splitlines(),1):
+        line=raw.strip()
+        if not line or line.startswith('#'): continue
+        if not in_payload:
+            if line=='payload:' or re.fullmatch(r'payload:\s*\[\s*\]',line): in_payload=True; continue
+            raise BuildError(f'classical payload section missing; unexpected line {lineno}: {line[:60]!r}')
+        m=re.match(r'^-\s+(.*)$',line)
+        if not m: raise BuildError(f'classical line {lineno} is not a payload list item: {line[:60]!r}')
+        item=m.group(1).strip()
+        if len(item)>=2 and item[0]==item[-1] and item[0] in "'\"":
+            item=item[1:-1]
+        else:
+            item=re.sub(r'\s+#.*$','',item).strip()
+        if item: rules.append(item)
+    if not in_payload: raise BuildError('classical payload section missing')
+    return rules
+
+def classical_parse(text:str, target:str):
+    """Parse a mihomo classical rule-provider with the Clash rule semantics."""
+    return clash_parse('\n'.join(classical_payload(text)), target)
+
+def rule_source_parse(fmt:str, payload, target:str):
+    if fmt=='clash': return clash_parse(payload, target)
+    if fmt=='classical': return classical_parse(payload, target)
+    raise BuildError(f'unsupported rule source format for {target}: {fmt}')
+
 def custom_domains(root:Path, tag:str):
     add=[]; rem=[]; d=root/'custom'/'geosite'
     for suffix,out in [('.add.txt',add),('.remove.txt',rem)]:
@@ -209,6 +238,7 @@ def load_source(spec, cache):
     raw=fetch(spec['url'],cache)
     fmt=spec.get('format','geosite')
     if fmt=='clash': return ('clash',raw.decode('utf-8'))
+    if fmt=='classical': return ('classical',raw.decode('utf-8'))
     if fmt=='singbox-ads': return ('singbox-ads',singbox_ad_domains(raw))
     if fmt=='geosite': return ('geosite',decode_geosite(raw))
     if fmt=='geoip': return ('geoip',decode_geoip(raw))
@@ -294,7 +324,7 @@ def build(config:dict, output:Path):
             for ref in refs:
                 sid=ref['source']; up=ref.get('tag',tag); fmt,payload=loaded[sid]; sk={}
                 if kind=='geosite':
-                    if fmt=='clash': d,_,sk=clash_parse(payload,'geosite'); vals_d += d
+                    if fmt in ('clash','classical'): d,_,sk=rule_source_parse(fmt,payload,'geosite'); vals_d += d
                     elif fmt=='singbox-ads':
                         if tag!='category-ads-all': raise BuildError('sing-box ads may only supplement category-ads-all')
                         d,sk=payload; vals_d += d
@@ -304,7 +334,7 @@ def build(config:dict, output:Path):
                     else: raise BuildError(f'geoip source {sid} used for geosite')
                 else:
                     if inverse: raise BuildError(f'cannot merge into inverse base geoip tag: {tag}')
-                    if fmt=='clash': _,c,sk=clash_parse(payload,'geoip'); vals_i += c
+                    if fmt in ('clash','classical'): _,c,sk=rule_source_parse(fmt,payload,'geoip'); vals_i += c
                     elif fmt=='geoip':
                         if up.lower() not in payload: raise BuildError(f'missing geoip tag {up} in {sid}')
                         c,inv=payload[up.lower()]

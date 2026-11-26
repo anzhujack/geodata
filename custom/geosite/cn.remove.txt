@@ -1,0 +1,71 @@
+# cn 直连里剔除「国内被墙」的交易所域。
+#
+# 2026-11-26 并入 PuthsenTaylor/Mihomo-RuleSets 的 Domestic-Direct 集时，上游刻意把
+# 币安、欧易、Bybit、Bitget、Gate 等交易所归进国内直连（其 README 的取舍：服务商眼中
+# 始终是国内 IP，账号风控画像连贯）。这些站在大陆直连基本不可用，而合并前它们走的是
+# 兜底代理，所以这里原样剔掉，避免「合并规则」顺手把它们从代理翻成直连。
+#
+# 想完全照上游：删掉本文件后重新构建即可（这 63 条会重新进入 geosite:cn）。
+domain:binance
+domain:binance.cc
+domain:binance.charity
+domain:binance.cloud
+domain:binance.co
+domain:binance.com
+domain:binance.info
+domain:binance.me
+domain:binance.net
+domain:binance.org
+domain:binance.us
+domain:binance.vision
+domain:binanceapi.com
+domain:binancecnt.com
+domain:binancefuture.com
+domain:binanceru.net
+domain:binancezh.be
+domain:binancezh.biz
+domain:binancezh.cc
+domain:binancezh.co
+domain:binancezh.com
+domain:binancezh.info
+domain:binancezh.ink
+domain:binancezh.live
+domain:binancezh.mobi
+domain:binancezh.net
+domain:binancezh.pro
+domain:binancezh.sh
+domain:binancezh.top
+domain:bitget.app
+domain:bitget.cloud
+domain:bitget.com
+domain:bnappweb.black
+domain:bnappzh.co
+domain:bnbchain.org
+domain:bnbstatic.com
+domain:bnbzh.ac
+domain:bybit-exchange.github.io
+domain:bybit-global.com
+domain:bybit.ada.support
+domain:bybit.biz
+domain:bybit.cloud
+domain:bybit.com
+domain:bybitglobal.com
+domain:gate.com
+domain:gate.io
+domain:gate.tv
+domain:gateapi.io
+domain:gatedata.org
+domain:gateimg.com
+domain:gateio.live
+domain:gateio.services
+domain:gateio.ws
+domain:okx
+domain:okx-dns.com
+domain:okx-dns1.com
+domain:okx-dns2.com
+domain:okx.ac
+domain:okx.cab
+domain:okx.com
+domain:okx.com.cdn.cloudflare.net
+domain:okx.com.hk
+domain:okxcdn.com

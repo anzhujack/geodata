@@ -263,5 +263,50 @@ class BuildTests(unittest.TestCase):
             b.decode_domain(b'\x08\x09' + b.fbytes(2, b'example.com'))
 
 
+    def test_classical_rule_provider_uses_clash_semantics(self):
+        text = (
+            '# mihomo classical rule-provider\n'
+            'payload:\n'
+            "  - 'DOMAIN-SUFFIX,Example.COM'\n"
+            '  - DOMAIN,full.example.com  # trailing comment\n'
+            '  - DOMAIN-KEYWORD,sub.\n'
+            '  - PROCESS-NAME,Telegram\n'
+            '  - IP-ASN,1234\n'
+            '  - IP-CIDR,192.0.2.0/24,no-resolve\n'
+        )
+        cfg = {
+            'sources': {'s': self.source('set.yaml', text.encode(), 'classical')},
+            'geosite': {'svc': [{'source': 's'}]},
+            'geoip': {'svc': [{'source': 's'}]},
+        }
+        manifest = self.build(cfg)
+        site = b.decode_geosite((self.output / 'geosite.dat').read_bytes())['svc']
+        self.assertEqual(
+            {(d[0], d[1]) for d in site},
+            {(2, 'example.com'), (3, 'full.example.com'), (0, 'sub.')},
+        )
+        networks, inverse = b.decode_geoip((self.output / 'geoip.dat').read_bytes())['svc']
+        self.assertFalse(inverse)
+        self.assertEqual(networks, [ipaddress.ip_network('192.0.2.0/24')])
+        self.assertEqual(manifest['skipped']['s:PROCESS-NAME'], 1)
+        self.assertEqual(manifest['skipped']['s:IP-ASN'], 1)
+
+    def test_classical_payload_errors_are_reported(self):
+        cases = {
+            'missing payload section': 'DOMAIN-SUFFIX,example.com\n',
+            'non list item': 'payload:\nDOMAIN,example.com\n',
+            'unknown rule type': 'payload:\n  - TOTALLY-UNKNOWN,x\n',
+            'invalid cidr': 'payload:\n  - IP-CIDR,not-a-cidr\n',
+        }
+        for label, text in cases.items():
+            with self.subTest(label):
+                cfg = {
+                    'sources': {'s': self.source('bad.yaml', text.encode(), 'classical')},
+                    'geosite': {'svc': [{'source': 's'}]},
+                }
+                with self.assertRaises(b.BuildError):
+                    self.build(cfg)
+
+
 if __name__ == '__main__':
     unittest.main()

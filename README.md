@@ -71,6 +71,41 @@ sha256sum -c geoip.dat.sha256
 
 `geolocation-!cn` 与 `category-ads-all` 是标准名称，个人增删请编辑这两个名字对应的文件。上一版同时提供的短名称 `proxy`、`ads` 已移除：它们的合并内容与标准名称逐条相同，同时存在会让产物多出约 8 MB 而分流结果不变。若你的客户端配置里写着 `geosite:proxy` 或 `geosite:ads`，请改成对应的标准名称——dae 遇到不存在的 geosite 标签会直接拒绝加载。DustinWin 与 blackmatrix7 的补充范围仍由增强映射明确控制，不扫描 blackmatrix7 仓库中与 DAT 无关的进程、端口等规则。
 
+### Mihomo 规则集来源（2026-11-26 起）
+
+[PuthsenTaylor/Mihomo-RuleSets](https://github.com/PuthsenTaylor/Mihomo-RuleSets) 是 25 份 Mihomo `rule-provider`（classical）规则集，共 18,545 条，按公司归属分流。`sources.json` 里以 `format: classical` 引入，构建器把 `payload:` 下的规则按 Clash 语义转换：`DOMAIN-SUFFIX`→根域匹配、`DOMAIN`→完整匹配、`DOMAIN-KEYWORD`→关键词、`DOMAIN-REGEX`→正则、`IP-CIDR`/`IP-CIDR6`→IP 段。
+
+映射关系（域名集进 geosite，IP 集进 geoip）：
+
+| 上游文件 | 目标分类 |
+| --- | --- |
+| `LAN_Domain` / `LAN_IP` | `private` |
+| `NTP_Domain` | `ntp`（新分类） |
+| `Google_Domain` / `Google_IP` | `google` |
+| `Apple_Domain` / `Apple_IP` | `apple` / `apple`（新 geoip 分类） |
+| `Netflix_Domain` / `Netflix_IP` | `netflix` |
+| `Disney_Domain` | `disney` |
+| `Emby_Domain` | `emby`（新分类） |
+| `TikTok_Domain` | `tiktok` |
+| `Spotify_Domain` / `Spotify_IP` | `spotify` / `spotify`（新 geoip 分类） |
+| `Telegram_Domain` / `Telegram_IP` | `telegram` |
+| `Meta_Domain` / `Meta_IP` | `meta` / `meta`（新 geoip 分类） |
+| `Twitter_Domain` / `Twitter_IP` | `x` / `twitter` |
+| `AI_Domain` / `AI_IP` | `ai` / `ai`（新 geoip 分类） |
+| `Domestic-Direct_Domain` / `Domestic-Direct_IP` | `cn` |
+
+2026-11-26 实测增量（并入前 → 并入后）：`cn` 113,004 → 114,415、`tiktok` 101 → 303、`google` 1,093 → 1,189、`apple` 1,668 → 1,785、`ai` 315 → 352、`meta` 557 → 567、`disney` 242 → 254、`x` 30 → 32、`private` 145 → 148，新增 `ntp` 169、`emby` 12；geoip 侧新增 `meta` 149、`apple` 13、`spotify` 2、`ai` 2，`cn` 只多 1 个网段。
+
+并入时的三处本地取舍，都在 `custom/` 里，可逐条回退：
+
+- `custom/geosite/cn.remove.txt`：剔除 63 条交易所域（币安、欧易、Bybit、Bitget、Gate 及其变体）。上游把交易所刻意归进国内直连，但它们在境内直连不可用，合并前走的是兜底代理；照抄会让这些域从代理翻成直连，所以按原状剔除。删除该文件即恢复上游口径。
+- `custom/geoip/cn.remove.txt`：剔除上游 `Domestic-Direct_IP` 带进来的 7 个腾讯云新加坡 `/32`（101.32.x，Aceville SG），与既有的「中国公司海外机房」剔除策略一致；`103.7.28.0/22` 属境内，保留。
+- 上游 `TikTok_IP` 的 4 条全是 `IP-ASN`，DAT 无法表达 ASN，未引入该文件；`PROCESS-NAME` 类规则（Apple 8、Telegram 6、Emby 6、Google 6 等）同样跳过，构建时计入 `manifest.json` 的 `skipped`。
+
+已知数据瑕疵（原样保留，未改动上游内容）：`TikTok_Domain` 里有 4 条以 `-` 或 `.` 开头的畸形后缀（`-ap-southeast-1.volces.com` 等），实际不会命中任何主机。
+
+上游无 LICENSE，规则版权归其引用的各公开作者；本仓库只做格式转换与合并，不改写其条目。
+
 ### 精准广告补漏
 
 - `category-ads-all` 每次构建都会从 [moiudev/rule-set](https://github.com/moiudev/rule-set) 拉取 `ads.json`，只合并可转换的域名后缀，不引入正则或其他规则集。导入时排除会命中已知短链（如 `t.co`、`t.me`、`bit.ly`）和番茄正文、听书接口的后缀；发布前再检查两个广告分类，防止其他上游误拦这些已知域名。过滤数量和上游文件 SHA256 见 `manifest.json`。这不是全站误杀保证。
@@ -217,6 +252,8 @@ sha256sum -c sha256sums.txt
 - DustinWin/ruleset_geodata：https://github.com/DustinWin/ruleset_geodata
 - Loyalsoldier/v2ray-rules-dat：https://github.com/Loyalsoldier/v2ray-rules-dat
 - blackmatrix7/ios_rule_script：https://github.com/blackmatrix7/ios_rule_script
+- PuthsenTaylor/Mihomo-RuleSets：https://github.com/PuthsenTaylor/Mihomo-RuleSets（按 MiHomo rule-provider 引入，见上文映射）
+- moiudev/rule-set：https://github.com/moiudev/rule-set
 - dae 官方配置示例：https://github.com/daeuniverse/dae/blob/main/example.dae
 
 本项目不改变上游数据的许可条件。发布合并数据时应保留来源及各上游所要求的署名/许可，特别是它们进一步引用的数据源；这里没有为第三方数据授予新的许可。
