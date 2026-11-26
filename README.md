@@ -89,17 +89,18 @@ sha256sum -c geoip.dat.sha256
 | `TikTok_Domain` | `tiktok` |
 | `Spotify_Domain` / `Spotify_IP` | `spotify` / `spotify`（新 geoip 分类） |
 | `Telegram_Domain` / `Telegram_IP` | `telegram` |
-| `Meta_Domain` / `Meta_IP` | `meta` / `meta`（新 geoip 分类） |
+| `Meta_Domain` / `Meta_IP` | `meta`（域名用上游，IP 改由 `tools/meta_asn.py` 按 ASN 生成） |
 | `Twitter_Domain` / `Twitter_IP` | `x` / `twitter` |
 | `AI_Domain` / `AI_IP` | `ai` / `ai`（新 geoip 分类） |
 | `Domestic-Direct_Domain` / `Domestic-Direct_IP` | `cn` |
 
-2026-11-26 实测增量（并入前 → 并入后）：`cn` 113,004 → 114,415、`tiktok` 101 → 303、`google` 1,093 → 1,189、`apple` 1,668 → 1,785、`ai` 315 → 352、`meta` 557 → 567、`disney` 242 → 254、`x` 30 → 32、`private` 145 → 148，新增 `ntp` 169、`emby` 12；geoip 侧新增 `meta` 149、`apple` 13、`spotify` 2、`ai` 2，`cn` 只多 1 个网段。
+2026-11-26 实测增量（并入前 → 并入后）：`cn` 113,004 → 114,415、`tiktok` 101 → 303、`google` 1,093 → 1,189、`apple` 1,668 → 1,785、`ai` 315 → 352、`meta` 557 → 567、`disney` 242 → 254、`x` 30 → 32、`private` 145 → 148，新增 `ntp` 169、`emby` 12；geoip 侧新增 `meta` 123（按 ASN 生成，见下）、`apple` 13、`spotify` 2、`ai` 2，`cn` 只多 1 个网段。
 
 并入时的三处本地取舍，都在 `custom/` 里，可逐条回退：
 
 - `custom/geosite/cn.remove.txt`：剔除 63 条交易所域（币安、欧易、Bybit、Bitget、Gate 及其变体）。上游把交易所刻意归进国内直连，但它们在境内直连不可用，合并前走的是兜底代理；照抄会让这些域从代理翻成直连，所以按原状剔除。删除该文件即恢复上游口径。
 - `custom/geoip/cn.remove.txt`：剔除上游 `Domestic-Direct_IP` 带进来的 7 个腾讯云新加坡 `/32`（101.32.x，Aceville SG），与既有的「中国公司海外机房」剔除策略一致；`103.7.28.0/22` 属境内，保留。
+- **`geoip:meta` 不用上游 `Meta_IP`**：逐条查 origin AS 后发现 149 个段里有 21 个不属于 Meta——AWS `34.224.0.0/12`、`18.194.0.0/15`、`52.58.0.0/15` 等，IBM SoftLayer，LINE 日本段，`108.177.8.0/24` 甚至是 Google DNS。这些段一旦挂上 `dip(geoip:meta)`，别人的流量会被拐到 Instagram 出口。改用 `tools/meta_asn.py` 从 RIPE Stat 取 AS32934 / AS63293 / AS54115 的宣告前缀生成 `custom/geoip/meta.add.txt`（81 个 IPv4 + 42 个 IPv6 段），构建前自动刷新，拉取失败则沿用仓库内旧清单。复查结果：非 Meta 段 0 个。
 - 上游 `TikTok_IP` 的 4 条全是 `IP-ASN`，DAT 无法表达 ASN，未引入该文件；`PROCESS-NAME` 类规则（Apple 8、Telegram 6、Emby 6、Google 6 等）同样跳过，构建时计入 `manifest.json` 的 `skipped`。
 
 已知数据瑕疵（原样保留，未改动上游内容）：`TikTok_Domain` 里有 4 条以 `-` 或 `.` 开头的畸形后缀（`-ap-southeast-1.volces.com` 等），实际不会命中任何主机。

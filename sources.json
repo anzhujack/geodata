@@ -136,10 +136,6 @@
       "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Meta_Domain.yaml",
       "format": "classical"
     },
-    "pt-meta-ip": {
-      "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Meta_IP.yaml",
-      "format": "classical"
-    },
     "pt-twitter-domain": {
       "url": "https://raw.githubusercontent.com/PuthsenTaylor/Mihomo-RuleSets/main/Twitter_Domain.yaml",
       "format": "classical"
@@ -501,11 +497,7 @@
         "source": "pt-spotify-ip"
       }
     ],
-    "meta": [
-      {
-        "source": "pt-meta-ip"
-      }
-    ],
+    "meta": [],
     "twitter": [
       {
         "source": "pt-twitter-ip"
